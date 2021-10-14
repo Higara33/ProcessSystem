@@ -1,116 +1,116 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using ProcessSystem.Contracts;
-using ProcessSystem.Controllers;
-using ProcessSystem.Token;
+﻿//using System.Threading.Tasks;
+//using Microsoft.AspNetCore.Http;
+//using Microsoft.AspNetCore.Mvc;
+//using Microsoft.Extensions.Logging;
+//using Microsoft.Net.Http.Headers;
+//using Microsoft.VisualStudio.TestTools.UnitTesting;
+//using Moq;
+//using ProcessSystem.Contracts;
+//using ProcessSystem.Controllers;
+//using ProcessSystem.Token;
 
-namespace ProcessSystem.UnitTests
-{
-    [TestClass]
-    public class RegisterTest
-    {
-        private readonly Mock<ILogger<RegisterController>> _logger = new Mock<ILogger<RegisterController>>();
-        private readonly Mock<IToken> _token = new Mock<IToken>();
-        private readonly Register _register = new Register(
-            RegisterRepositoryMock.DefaultToken,
-            RegisterRepositoryMock.DefaultUrl,
-            RegisterRepositoryMock.DefaultUrl
-        );
+//namespace ProcessSystem.UnitTests
+//{
+//    [TestClass]
+//    public class RegisterTest
+//    {
+//        private readonly Mock<ILogger<RegisterController>> _logger = new Mock<ILogger<RegisterController>>();
+//        private readonly Mock<IToken> _token = new Mock<IToken>();
+//        private readonly Register _register = new Register(
+//            RegisterRepositoryMock.DefaultToken,
+//            RegisterRepositoryMock.DefaultUrl,
+//            RegisterRepositoryMock.DefaultUrl
+//        );
 
 
-        public RegisterTest()
-        {
-            _token.Setup(t => t.GenerateToken()).Returns(RegisterRepositoryMock.DefaultToken);
-        }
+//        public RegisterTest()
+//        {
+//            _token.Setup(t => t.GenerateToken()).Returns(RegisterRepositoryMock.DefaultToken);
+//        }
 
-        [TestMethod]
-        public async Task ShopWindowRegisterSuccessTest()
-        {
-            var repositoryMock = new RegisterRepositoryMock();
-            repositoryMock.SetupAddSuccess();
-            repositoryMock.SetupFindByChannelAndUrlFailure();
-            repositoryMock.SetupUnitOfWorkSuccess();
+//        [TestMethod]
+//        public async Task ShopWindowRegisterSuccessTest()
+//        {
+//            var repositoryMock = new RegisterRepositoryMock();
+//            repositoryMock.SetupAddSuccess();
+//            repositoryMock.SetupFindByChannelAndUrlFailure();
+//            repositoryMock.SetupUnitOfWorkSuccess();
 
-            var controller = new RegisterController(_logger.Object, _token.Object, repositoryMock.GetMockObject());
+//            var controller = new RegisterController(_logger.Object, _token.Object, repositoryMock.GetMockObject());
 
-            var res = await controller.Register(
-                new RegisterRequest()
-                {
-                    Url = RegisterRepositoryMock.DefaultUrl,
-                    Name = RegisterRepositoryMock.DefaultName,
-                    ProcessTypesList = RegisterRepositoryMock.DefaultProcessList
-                });
+//            var res = await controller.Register(
+//                new RegisterRequest()
+//                {
+//                    Url = RegisterRepositoryMock.DefaultUrl,
+//                    Name = RegisterRepositoryMock.DefaultName,
+//                    ProcessTypesList = RegisterRepositoryMock.DefaultProcessList
+//                });
 
-            Assert.AreEqual(RegisterRepositoryMock.DefaultToken, ((BaseResponse<string>)((CreatedAtActionResult)res.Result).Value).Data);
-        }
+//            Assert.AreEqual(RegisterRepositoryMock.DefaultToken, ((BaseResponse<string>)((CreatedAtActionResult)res.Result).Value).Data);
+//        }
 
-        [TestMethod]
-        public async Task ShopWindowAlreadyRegisteredErrorTest()
-        {
-            var repositoryMock = new RegisterRepositoryMock();
-            repositoryMock.SetupFindByChannelAndUrlSuccess();
+//        [TestMethod]
+//        public async Task ShopWindowAlreadyRegisteredErrorTest()
+//        {
+//            var repositoryMock = new RegisterRepositoryMock();
+//            repositoryMock.SetupFindByChannelAndUrlSuccess();
 
-            var controller = new RegisterController(_logger.Object, _token.Object, repositoryMock.GetMockObject());
+//            var controller = new RegisterController(_logger.Object, _token.Object, repositoryMock.GetMockObject());
 
-            var res = await controller.Register(
-                new RegisterRequest()
-                {
-                    Url = RegisterRepositoryMock.DefaultUrl,
-                    Name = RegisterRepositoryMock.DefaultName,
-                    ProcessTypesList = RegisterRepositoryMock.DefaultProcessList
-                });
+//            var res = await controller.Register(
+//                new RegisterRequest()
+//                {
+//                    Url = RegisterRepositoryMock.DefaultUrl,
+//                    Name = RegisterRepositoryMock.DefaultName,
+//                    ProcessTypesList = RegisterRepositoryMock.DefaultProcessList
+//                });
 
-            Assert.AreEqual($"Витрина с {RegisterRepositoryMock.DefaultUrl} и {RegisterRepositoryMock.DefaultName} уже зерегистрирована (Parameter 'registerRequest')", ((BaseResponse<object>)((ObjectResult)res.Result).Value).ErrorDescription);
-        }
+//            Assert.AreEqual($"Витрина с {RegisterRepositoryMock.DefaultUrl} и {RegisterRepositoryMock.DefaultName} уже зерегистрирована (Parameter 'registerRequest')", ((BaseResponse<object>)((ObjectResult)res.Result).Value).ErrorDescription);
+//        }
 
-        [TestMethod]
-        public async Task ShopWindowUnregisterSuccessTest()
-        {
-            var repositoryMock = new RegisterRepositoryMock();
-            repositoryMock.SetupDeleteSuccess(_register);
-            repositoryMock.SetupUnitOfWorkSuccess();
+//        [TestMethod]
+//        public async Task ShopWindowUnregisterSuccessTest()
+//        {
+//            var repositoryMock = new RegisterRepositoryMock();
+//            repositoryMock.SetupDeleteSuccess(_register);
+//            repositoryMock.SetupUnitOfWorkSuccess();
 
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers[HeaderNames.Authorization] = RegisterRepositoryMock.DefaultToken;
+//            var httpContext = new DefaultHttpContext();
+//            httpContext.Request.Headers[HeaderNames.Authorization] = RegisterRepositoryMock.DefaultToken;
 
-            var controller = new RegisterController(_logger.Object, _token.Object, repositoryMock.GetMockObject())
-            {
-                ControllerContext = new ControllerContext()
-                {
-                    HttpContext = httpContext,
-                }
-            };
+//            var controller = new RegisterController(_logger.Object, _token.Object, repositoryMock.GetMockObject())
+//            {
+//                ControllerContext = new ControllerContext()
+//                {
+//                    HttpContext = httpContext,
+//                }
+//            };
 
-            var res = await controller.UnRegister();
+//            var res = await controller.UnRegister();
 
-            Assert.AreEqual(_register.Token, ((BaseResponse<Register>)((CreatedAtActionResult)res.Result).Value).Data.Token);
-        }
+//            Assert.AreEqual(_register.Token, ((BaseResponse<Register>)((CreatedAtActionResult)res.Result).Value).Data.Token);
+//        }
 
-        [TestMethod]
-        public async Task ShopWindowUnregisterErrorTest()
-        {
-            var repositoryMock = new RegisterRepositoryMock();
-            repositoryMock.SetupDeleteFailure();
+//        [TestMethod]
+//        public async Task ShopWindowUnregisterErrorTest()
+//        {
+//            var repositoryMock = new RegisterRepositoryMock();
+//            repositoryMock.SetupDeleteFailure();
 
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers[HeaderNames.Authorization] = RegisterRepositoryMock.DefaultToken;
+//            var httpContext = new DefaultHttpContext();
+//            httpContext.Request.Headers[HeaderNames.Authorization] = RegisterRepositoryMock.DefaultToken;
 
-            var controller = new RegisterController(_logger.Object, _token.Object, repositoryMock.GetMockObject())
-            {
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = httpContext,
-                }
-            };
+//            var controller = new RegisterController(_logger.Object, _token.Object, repositoryMock.GetMockObject())
+//            {
+//                ControllerContext = new ControllerContext
+//                {
+//                    HttpContext = httpContext,
+//                }
+//            };
 
-            var res = await controller.UnRegister();
+//            var res = await controller.UnRegister();
 
-            Assert.AreEqual("UnRegisterError", ((BaseResponse<object>)((ObjectResult)res.Result).Value).ErrorCode);
-        }
-    }
-}
+//            Assert.AreEqual("UnRegisterError", ((BaseResponse<object>)((ObjectResult)res.Result).Value).ErrorCode);
+//        }
+//    }
+//}

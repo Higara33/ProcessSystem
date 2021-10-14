@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.DB;
@@ -10,7 +11,7 @@ namespace ProcessSystem.DB
     public class RegisterRepository
         : IRegisterRepository
     {
-        private readonly ProcessContext _context;
+        public readonly ProcessContext _context;
         public IUnitOfWork UnitOfWork => _context;
 
         public RegisterRepository(ProcessContext context)
@@ -25,17 +26,28 @@ namespace ProcessSystem.DB
                     .AddAsync(register))
                 .Entity;
         }
-        public  Register FindByNameAndUrl(Register register)
-        {
-            return _context.Register
-                .SingleOrDefault(sr => sr.Name == register.Name && sr.Url == register.Url);
-        }
 
+        public Register FindByNameAndUrl(Register register)
+        {
+            return new List<Register>
+            {
+                new Register("fhasdbvdhfb", "www", "user"),
+                new Register("afbdvSDVw", "rrr", "user2"),
+                new Register("hgfdasd", "ttt", "user3")
+            }
+            .SingleOrDefault(sr => sr.Name == register.Name && sr.Url == register.Url);
+        }
 
         public async Task<Register> FindByTokenAsync(string token)
         {
-            return await _context.Register
-                .SingleOrDefaultAsync(sr => sr.Token == token);
+
+            var list = new List<Register> 
+            {
+                new Register("fhasdbvdhfb", "www", "user"),
+                new Register("afbdvSDVw", "rrr", "user2"),
+                new Register("hgfdasd", "ttt", "user3")
+            };
+                return list.SingleOrDefault(sr => sr.Token == token);
 
         }
 

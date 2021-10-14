@@ -56,14 +56,15 @@ namespace ProcessSystem.Controllers
 
             try
             {
-
-                var check = testSettings.Value.millis;
-                string json = JsonSerializer.Serialize<IOptions<TestSettings>>(testSettings);
-                return CreatedAtAction(nameof(Register),
-                    new BaseResponse<string>
-                    {
-                        Data = json
-                    });
+                // не работал с хуевыми параметрами и возвращал ошбку по параметру
+                // 
+                //var check = testSettings.Value.millis;
+                //string json = JsonSerializer.Serialize<IOptions<TestSettings>>(testSettings);
+                //return CreatedAtAction(nameof(Register),
+                //    new BaseResponse<string>
+                //    {
+                //        Data = json
+                //    });
                 
 
                 _logger?.LogDebug("Register start");
